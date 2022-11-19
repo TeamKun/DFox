@@ -59,15 +59,15 @@ public final class DFox extends JavaPlugin implements Listener , CommandExecutor
                     }
                 }else if(args[0].equals("help")){
                     sender.sendMessage(ChatColor.GOLD + "-------------コマンド一覧-------------");
-                    sender.sendMessage("/df on   : プラグインのon");
-                    sender.sendMessage("/df off  : プラグインのoff");
-                    sender.sendMessage("/df help : プラグインのコマンド一覧");
+                    sender.sendMessage("/dfox on   : プラグインのon");
+                    sender.sendMessage("/dfox off  : プラグインのoff");
+                    sender.sendMessage("/dfox help : プラグインのコマンド一覧");
                     sender.sendMessage(ChatColor.GOLD + "-------------コマンド一覧-------------");
                 }else{
-                    sender.sendMessage(ChatColor.RED + "引数が異なります./df help");
+                    sender.sendMessage(ChatColor.RED + "引数が異なります./dfox help");
                 }
             }else{
-                sender.sendMessage(ChatColor.RED + "引数が異なります./df help");
+                sender.sendMessage(ChatColor.RED + "引数が異なります./dfox help");
             }
         }
         return false;
