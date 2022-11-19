@@ -4,7 +4,7 @@ main: net.kunmc.lab.dfox.DFox
 api-version: 1.16
 website: https://github.com/TeamKun
 commands:
-  df:
+  dfox:
     permission: DFX
 permissions:
   DFX:

@@ -26,8 +26,8 @@ public final class DFox extends JavaPlugin implements Listener , CommandExecutor
     public void onEnable() {
         saveDefaultConfig();
 
-        Objects.requireNonNull(this.getCommand("df")).setExecutor(this);
-        Objects.requireNonNull(this.getCommand("df")).setTabCompleter(this);
+        Objects.requireNonNull(this.getCommand("dfox")).setExecutor(this);
+        Objects.requireNonNull(this.getCommand("dfox")).setTabCompleter(this);
 
         getServer().getPluginManager().registerEvents(this, this);
 
@@ -41,7 +41,7 @@ public final class DFox extends JavaPlugin implements Listener , CommandExecutor
 
     @Override
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String label, String[] args) {
-        if (cmd.getName().equals("df")) {
+        if (cmd.getName().equals("dfox")) {
             if(args.length == 1){
                 if(args[0].equals("on")){
                     if(GAME){
@@ -75,10 +75,10 @@ public final class DFox extends JavaPlugin implements Listener , CommandExecutor
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-        if (cmd.getName().equals("df")) {
+        if (cmd.getName().equals("dfox")) {
             if (args.length == 1) {
-                return (sender.hasPermission("df")
-                        ? Stream.of("on","off")
+                return (sender.hasPermission("dfox")
+                        ? Stream.of("on","off","help")
                         : Stream.of("on","off","help"))
                         .filter(e -> e.startsWith(args[0])).collect(Collectors.toList());
             }

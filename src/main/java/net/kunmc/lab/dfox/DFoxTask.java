@@ -9,8 +9,8 @@ import org.bukkit.*;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Chicken;
 
+import org.bukkit.entity.Fox;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -42,102 +42,104 @@ public class DFoxTask extends BukkitRunnable{
 
     @Override
     public void run() {
-        for (String s : plugin.getConfig().getStringList("users")) {
-            if (Bukkit.getPlayer(s) != null && DFox.GAME) {
-                if (Bukkit.getPlayer(s).isOnline()) {
-                    double range = plugin.getConfig().getDouble("range");
+        if(DFox.GAME) {
+            for (String s : plugin.getConfig().getStringList("users")) {
+                if (Bukkit.getPlayer(s) != null) {
+                    if (Bukkit.getPlayer(s).isOnline()) {
+                        double range = plugin.getConfig().getDouble("range");
 
-                    for (LivingEntity le : Bukkit.getPlayer(s).getLocation().getNearbyLivingEntities(range)) {
-                        if (le instanceof Chicken) {
-                            if (!le.isDead()) {
-                                Player p = Bukkit.getPlayer(s);
-                                final Location loc = le.getLocation();
-                                List<Location> locations = calc(loc, p.getEyeLocation().clone().add(0, -1, 0), 0.2);
-                                new BukkitRunnable() {
-                                    Location loc2 = loc.clone();
+                        for (LivingEntity le : Bukkit.getPlayer(s).getLocation().getNearbyLivingEntities(range)) {
+                            if (le instanceof Fox) {
+                                if (!le.isDead()) {
+                                    Player p = Bukkit.getPlayer(s);
+                                    final Location loc = le.getLocation();
+                                    List<Location> locations = calc(loc, p.getEyeLocation().clone().add(0, -1, 0), 0.2);
+                                    new BukkitRunnable() {
+                                        Location loc2 = loc.clone();
 
-                                    @Override
-                                    public void run() {
-                                        List<Location> locations = calc(loc2, p.getEyeLocation().clone().add(0, -1, 0), 0.2);
-                                        Location l = locations.get(0);
-                                        l.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, l, 1);
-                                        if (locations.size() >= 2) {
-                                            l = locations.get(1);
+                                        @Override
+                                        public void run() {
+                                            List<Location> locations = calc(loc2, p.getEyeLocation().clone().add(0, -1, 0), 0.2);
+                                            Location l = locations.get(0);
                                             l.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, l, 1);
+                                            if (locations.size() >= 2) {
+                                                l = locations.get(1);
+                                                l.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, l, 1);
+                                            }
+                                            loc2 = l;
+                                            if (locations.size() < 1) {
+                                                this.cancel();
+                                            }
+                                            if (l.getBlockX() == p.getLocation().getBlockX() && l.getBlockZ() == p.getLocation().getBlockZ() && l.getBlockY() == p.getLocation().getBlockY()) {
+                                                this.cancel();
+                                            }
                                         }
-                                        loc2 = l;
-                                        if (locations.size() < 1) {
-                                            this.cancel();
-                                        }
-                                        if (l.getBlockX() == p.getLocation().getBlockX() && l.getBlockZ() == p.getLocation().getBlockZ() && l.getBlockY() == p.getLocation().getBlockY()) {
-                                            this.cancel();
-                                        }
+                                    }.runTaskTimer(this.plugin, 1, 1);
+
+                                    int kill = 0;
+                                    if (killed.containsKey(p.getName())) {
+                                        kill = killed.get(p.getName());
                                     }
-                                }.runTaskTimer(this.plugin, 1, 1);
+                                    int i = (int) Math.floor(kill / 100);
+                                    p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 20 * 300, i, true));
+                                    p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 300, i, true));
 
-                                int kill = 0;
-                                if(killed.containsKey(p.getName())) {
-                                    kill = killed.get(p.getName());
+                                    if (killed.containsKey(s)) {
+                                        killed.replace(s, killed.get(s) + 1);
+                                    } else {
+                                        killed.put(s, 1);
+                                    }
+
+                                    le.damage(1000, p);
+                                    le.setKiller(p);
                                 }
-                                int i = (int) Math.floor(kill / 100);
-                                p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 20*300, i, true));
-                                p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20*300, i, true));
-
-                                if (killed.containsKey(s)) {
-                                    killed.replace(s, killed.get(s) + 1);
-                                } else {
-                                    killed.put(s, 1);
-                                }
-
-                                le.damage(1000, p);
-                                le.setKiller(p);
                             }
                         }
                     }
                 }
             }
-        }
 
-        for (Map.Entry<String, Integer> entry : killed.entrySet()) {
-            String name = entry.getKey();
-            int kill = entry.getValue();
+            for (Map.Entry<String, Integer> entry : killed.entrySet()) {
+                String name = entry.getKey();
+                int kill = entry.getValue();
 
-            BossBar boss;
-            int i = (int) Math.floor(kill / 100) + 1;
-            if (bar.containsKey(name)) {
-                boss = bar.get(name);
-            } else {
-                boss = Bukkit.createBossBar(name + "がキツネを吸収した数: " + kill + " Lv: " + i, BarColor.WHITE, BarStyle.SEGMENTED_10);
-                bar.put(name, boss);
-            }
+                BossBar boss;
+                int i = (int) Math.floor(kill / 3) + 1;
+                if (bar.containsKey(name)) {
+                    boss = bar.get(name);
+                } else {
+                    boss = Bukkit.createBossBar(name + "がキツネを吸収した数: " + kill + " Lv: " + i, BarColor.WHITE, BarStyle.SEGMENTED_10);
+                    bar.put(name, boss);
+                }
 
-            BarColor color = BarColor.WHITE;
-            if (kill <= 100) {
-                color = BarColor.WHITE;
-            } else if (kill <= 200) {
-                color = BarColor.PURPLE;
-            } else if (kill <= 300) {
-                color = BarColor.BLUE;
-            } else if (kill <= 400) {
-                color = BarColor.GREEN;
-            } else if (kill <= 500) {
-                color = BarColor.YELLOW;
-            } else if (kill <= 600) {
-                color = BarColor.PINK;
-            } else if (kill <= 700) {
-                color = BarColor.RED;
-            } else {
-                color = BarColor.RED;
-            }
+                BarColor color = BarColor.WHITE;
+                if (kill <= 3) {
+                    color = BarColor.WHITE;
+                } else if (kill <= 6) {
+                    color = BarColor.PURPLE;
+                } else if (kill <= 9) {
+                    color = BarColor.BLUE;
+                } else if (kill <= 12) {
+                    color = BarColor.GREEN;
+                } else if (kill <= 15) {
+                    color = BarColor.YELLOW;
+                } else if (kill <= 18) {
+                    color = BarColor.PINK;
+                } else if (kill <= 21) {
+                    color = BarColor.RED;
+                } else {
+                    color = BarColor.RED;
+                }
 
-            boss.setTitle(name + "がキツネを吸収した数: " + kill + " Lv: " + i);
-            boss.setColor(color);
+                boss.setTitle(name + "がキツネを吸収した数: " + kill + " Lv: " + i);
+                boss.setColor(color);
 
-            double count100 = (double) Math.floor(kill / 100);
-            boss.setProgress((kill - (100 * count100)) / 100);
+                double count100 = (double) Math.floor(kill / 3);
+                boss.setProgress((kill - (3 * count100)) / 3);
 
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                boss.addPlayer(p);
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    boss.addPlayer(p);
+                }
             }
         }
     }
