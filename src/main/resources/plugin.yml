@@ -1,0 +1,11 @@
+name: DFox
+version: '${project.version}'
+main: net.kunmc.lab.dfox.DFox
+api-version: 1.16
+website: https://github.com/TeamKun
+commands:
+  df:
+    permission: DFX
+permissions:
+  DFX:
+    default: op
