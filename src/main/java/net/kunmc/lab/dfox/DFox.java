@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,6 +25,9 @@ public final class DFox extends JavaPlugin implements Listener , CommandExecutor
     @Override
     public void onEnable() {
         saveDefaultConfig();
+
+        Objects.requireNonNull(this.getCommand("df")).setExecutor(this);
+        Objects.requireNonNull(this.getCommand("df")).setTabCompleter(this);
 
         getServer().getPluginManager().registerEvents(this, this);
 
