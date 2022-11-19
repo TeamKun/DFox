@@ -1,6 +1,7 @@
 package net.kunmc.lab.dfox;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -11,6 +12,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class DFox extends JavaPlugin implements Listener , CommandExecutor, TabCompleter {
     public static boolean GAME = false;
@@ -29,6 +35,7 @@ public final class DFox extends JavaPlugin implements Listener , CommandExecutor
         DFoxTask.disable();
     }
 
+    @Override
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String label, String[] args) {
         if (cmd.getName().equals("df")) {
             if(args.length == 1){
@@ -60,6 +67,19 @@ public final class DFox extends JavaPlugin implements Listener , CommandExecutor
             }
         }
         return false;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        if (cmd.getName().equals("df")) {
+            if (args.length == 1) {
+                return (sender.hasPermission("df")
+                        ? Stream.of("on","off")
+                        : Stream.of("on","off","help"))
+                        .filter(e -> e.startsWith(args[0])).collect(Collectors.toList());
+            }
+        }
+        return new ArrayList<>();
     }
 
     @EventHandler
