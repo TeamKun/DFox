@@ -32,6 +32,7 @@ public final class DFox extends JavaPlugin implements Listener , CommandExecutor
         getServer().getPluginManager().registerEvents(this, this);
 
         new DFoxTask(this).runTaskTimer(this, 2, 10);
+
     }
 
     @Override

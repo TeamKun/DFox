@@ -20,6 +20,7 @@ import org.bukkit.util.Vector;
 
 public class DFoxTask extends BukkitRunnable{
     DFox plugin;
+    boolean cnf = false;
     Map<String, Integer> killed;
     public static Map<String, BossBar> bar;
     Map<String, Integer> stats;
@@ -47,7 +48,6 @@ public class DFoxTask extends BukkitRunnable{
                 if (Bukkit.getPlayer(s) != null) {
                     if (Bukkit.getPlayer(s).isOnline()) {
                         double range = plugin.getConfig().getDouble("range");
-
                         for (LivingEntity le : Bukkit.getPlayer(s).getLocation().getNearbyLivingEntities(range)) {
                             if (le instanceof Fox) {
                                 if (!le.isDead()) {
@@ -83,12 +83,19 @@ public class DFoxTask extends BukkitRunnable{
                                     int i = (int) Math.floor(kill / 100);
                                     p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 20 * 300, i, true));
                                     p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 300, i, true));
-
+                                    if(!cnf){
+                                        plugin.saveDefaultConfig();
+                                        killed.put(s, plugin.getConfig().getInt("killed"));
+                                        cnf = true;
+                                    }
                                     if (killed.containsKey(s)) {
                                         killed.replace(s, killed.get(s) + 1);
                                     } else {
                                         killed.put(s, 1);
                                     }
+
+                                    plugin.getConfig().set("killed",killed.get(s));
+                                    plugin.saveConfig();
 
                                     le.damage(1000, p);
                                     le.setKiller(p);
